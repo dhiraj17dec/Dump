@@ -1,0 +1,24 @@
+Which of the tools is not mandated for integration in a CI pipeline
+Selenium
+Code changes can be hidden,enabled or disabled using _________________.
+All of the Options
+What are the reasons for a build to fail ?
+Build Break
+Capablility of your build system to handle an increase in the amount of code that it integrates and analyzes is known as ____________?
+_____________ is a continuous integration server.
+Team City
+Build can be triggered by a version control tool.
+True
+Time taken to fix a broken build is measured using ________________.
+Build Repair rate
+Which of these is not mandated for a CI pipeline 
+Functional testing
+In a normal scenario, software from ____________ is deployed to production.
+Master Branch
+CCMetrics is used to identify _______________________."
+code Complexity
+Staged builds include _________
+Both Secondary Build and Commit Builds
+Work Branch is also known as 
+Codeline
+
