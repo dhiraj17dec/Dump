@@ -1,0 +1,26 @@
+# Add Celsius class implementation below.
+class Celsius:
+    def __get__(self, obj, owner):
+        return self.__celsius
+    
+    def __set__(self, obj, celsius):
+        self.__celsius = 32 + 9 * celsius / 5 
+
+# Add temperature class implementation below.
+class Temperature:
+    def __init__(self, value):
+        self.__fahrenheit = value
+    
+    def getfahrenheit(self):
+        return self.__fahrenheit
+    
+    def setfahrenheit(self, value):
+        self.__fahrenheit = value
+    
+    fahrenheit = property(getfahrenheit, setfahrenheit)
+    celsius = Celsius()
+
+t1 = Temperature(32)
+t1.celsius = 0
+        
+'''Check the Tail section for input/output'''
