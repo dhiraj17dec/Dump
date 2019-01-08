@@ -1,0 +1,393 @@
+package com.ecag.buyin.auction.dao;
+
+import java.util.List;
+
+import com.ecag.buyin.auction.model.Transaction;
+
+public interface TransactionDAO {
+	
+	
+	public List<Transaction> getAllTransactions(long auctionId);
+	
+	public List<Transaction> getTransaction(long transactionId);
+	
+	
+
+}
+
+
+
+package com.ecag.buyin.auction.dao;
+
+import java.util.List;
+
+import org.hibernate.Session;
+import org.hibernate.SessionFactory;
+
+import com.ecag.buyin.auction.model.Transaction;
+
+public class TransactionDAOImpl implements TransactionDAO {
+
+
+	private SessionFactory sessionFactory;
+
+    public void setSessionFactory(SessionFactory sessionFactory) {
+        this.sessionFactory = sessionFactory;
+    }
+
+    @SuppressWarnings("unchecked")
+	public List<Transaction> getAllTransactions(long auctionId) {
+		Session session = this.sessionFactory.openSession();
+		List<Transaction> transactionList = session.createQuery("from Transaction").list();
+		session.close();
+		return transactionList;
+	}
+
+	public List<Transaction> getTransaction(long transactionId) {
+		String hql = "from Transaction T where T.tradeid = "+transactionId;
+		Session session = this.sessionFactory.openSession();
+		List<Transaction> transactionList = session.createQuery(hql).list();
+		session.close();
+		return transactionList;
+	}
+
+}
+
+
+package com.ecag.buyin.auction.main;
+
+import java.util.List;
+
+import org.springframework.context.support.ClassPathXmlApplicationContext;
+
+import com.ecag.buyin.auction.dao.PersonDAO;
+import com.ecag.buyin.auction.dao.TransactionDAO;
+import com.ecag.buyin.auction.model.Person;
+import com.ecag.buyin.auction.model.Transaction;
+
+public class SpringHibernateMain {
+
+	public static void main(String[] args) {
+
+		ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext("spring.xml");
+		
+		PersonDAO personDAO = context.getBean(PersonDAO.class);
+		TransactionDAO transactionDAO = context.getBean(TransactionDAO.class);
+		
+//		Person person = new Person();
+//		person.setName("Pankaj"); person.setCountry("India");
+//		
+//		personDAO.save(person);
+//		
+//		System.out.println("Person::"+person);
+		
+		List<Person> list = personDAO.list();
+		
+		for(Person p : list){
+			System.out.println("Person List::"+p);
+		}
+		
+//		List<Transaction> transactionList = transactionDAO.getAllTransactions(1);
+		
+		List<Transaction> transactionList = transactionDAO.getTransaction(4);
+		for(Transaction t : transactionList){
+			System.out.println("Transaction List ::"+t);
+		}
+		
+		context.close();
+		
+	}
+
+}
+
+
+
+package com.ecag.buyin.auction.model;
+
+import java.sql.Date;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.Table;
+
+@Entity
+@Table(name="trades")
+public class Transaction {
+
+	@Id
+	@Column(name="tradeid")
+	@GeneratedValue(strategy=GenerationType.IDENTITY)
+	private int tradeid;
+	
+	private int orderid;
+	private int offerid;
+	private float price;
+	
+	private Date tradetime;
+
+	private int tradeqty;
+
+	public int getTradeid() {
+		return tradeid;
+	}
+
+	public void setTradeid(int tradeid) {
+		this.tradeid = tradeid;
+	}
+
+	public int getOrderid() {
+		return orderid;
+	}
+
+	public void setOrderid(int orderid) {
+		this.orderid = orderid;
+	}
+
+	public int getOfferid() {
+		return offerid;
+	}
+
+	public void setOfferid(int offerid) {
+		this.offerid = offerid;
+	}
+
+	public float getPrice() {
+		return price;
+	}
+
+	public void setPrice(float price) {
+		this.price = price;
+	}
+
+	public Date getTradetime() {
+		return tradetime;
+	}
+
+	public void setTradetime(Date tradetime) {
+		this.tradetime = tradetime;
+	}
+
+	public int getTradeqty() {
+		return tradeqty;
+	}
+
+	public void setTradeqty(int tradeqty) {
+		this.tradeqty = tradeqty;
+	}
+
+	@Override
+	public String toString() {
+		return "Transaction [tradeid=" + tradeid + ", orderid=" + orderid + ", offerid=" + offerid + ", price=" + price
+				+ ", tradetime=" + tradetime + ", tradeqty=" + tradeqty + "]";
+	}
+	
+	
+}
+
+
+
+
+
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-4.0.xsd
+		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-4.0.xsd">
+
+	<bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource"
+		destroy-method="close">
+		<property name="driverClassName" value="org.postgresql.Driver" />
+		<property name="url" value="jdbc:postgresql://localhost:5432/postgres" />
+		<property name="username" value="postgres" />
+		<property name="password" value="admin" />
+	</bean>
+
+<!-- Hibernate 3 XML SessionFactory Bean definition-->
+<!-- 	<bean id="hibernate3SessionFactory"
+		class="org.springframework.orm.hibernate3.LocalSessionFactoryBean">
+		<property name="dataSource" ref="dataSource" />
+		<property name="mappingResources">
+			<list>
+				<value>person.hbm.xml</value>
+			</list>
+		</property>
+		<property name="hibernateProperties">
+			<value>
+				hibernate.dialect=org.hibernate.dialect.MySQLDialect
+			</value>
+		</property>
+	</bean> -->
+
+<!-- Hibernate 3 Annotation SessionFactory Bean definition-->
+	<bean id="hibernate3AnnotatedSessionFactory"
+		class="org.springframework.orm.hibernate3.annotation.AnnotationSessionFactoryBean">
+		<property name="dataSource" ref="dataSource" />
+		<property name="annotatedClasses">
+			<list>
+				<value>com.ecag.buyin.auction.model.Person</value>
+				<value>com.ecag.buyin.auction.model.Transaction</value>
+			</list>
+		</property>
+		<property name="hibernateProperties">
+			<props>
+				<prop key="hibernate.dialect">org.hibernate.dialect.PostgreSQLDialect</prop>
+				<prop key="hibernate.current_session_context_class">thread</prop>
+				<prop key="hibernate.show_sql">false</prop>
+			</props>
+		</property>
+	</bean>
+	
+	<bean id="personDAO" class="com.ecag.buyin.auction.dao.PersonDAOImpl">
+		<property name="sessionFactory" ref="hibernate3AnnotatedSessionFactory" />
+	</bean>
+	<bean id="transactionDAO" class="com.ecag.buyin.auction.dao.TransactionDAOImpl">
+		<property name="sessionFactory" ref="hibernate3AnnotatedSessionFactory" />
+	</bean>
+</beans>
+
+
+
+
+
+
+
+
+
+
+<?xml version="1.0"?>
+<project
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0">
+
+	<modelVersion>4.0.0</modelVersion>
+
+	<groupId>org.ecag.buyin</groupId>
+
+	<artifactId>auction</artifactId>
+
+	<version>0.0.1-SNAPSHOT</version>
+	<properties>
+
+		<!-- Generic properties -->
+		<java.version>1.8</java.version>
+
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+
+		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+
+		<!-- Spring -->
+
+
+		<spring-framework.version>4.0.3.RELEASE</spring-framework.version>
+
+		<!-- Hibernate / JPA -->
+		<hibernate.version>3.6.9.Final</hibernate.version>
+
+		<!-- Logging -->
+		<logback.version>1.0.13</logback.version>
+
+		<slf4j.version>1.7.5</slf4j.version>
+
+	</properties>
+
+	<dependencies>
+		<!-- Spring and Transactions -->
+		<dependency>
+
+			<groupId>org.springframework</groupId>
+
+			<artifactId>spring-context</artifactId>
+
+			<version>${spring-framework.version}</version>
+
+		</dependency>
+		<dependency>
+
+			<groupId>org.springframework</groupId>
+
+			<artifactId>spring-tx</artifactId>
+
+			<version>${spring-framework.version}</version>
+
+		</dependency>
+
+		<!-- Spring ORM support -->
+
+		<dependency>
+
+			<groupId>org.springframework</groupId>
+
+			<artifactId>spring-orm</artifactId>
+
+			<version>${spring-framework.version}</version>
+
+		</dependency>
+
+		<!-- Logging with SLF4J & LogBack -->
+		<dependency>
+
+			<groupId>org.slf4j</groupId>
+
+			<artifactId>slf4j-api</artifactId>
+
+			<version>${slf4j.version}</version>
+
+			<scope>compile</scope>
+
+		</dependency>
+
+		<dependency>
+
+			<groupId>ch.qos.logback</groupId>
+
+			<artifactId>logback-classic</artifactId>
+
+			<version>${logback.version}</version>
+
+			<scope>runtime</scope>
+
+		</dependency>
+
+		<!-- Hibernate -->
+
+		<dependency>
+
+			<groupId>org.hibernate</groupId>
+
+			<artifactId>hibernate-entitymanager</artifactId>
+
+			<version>${hibernate.version}</version>
+
+		</dependency>
+
+		<dependency>
+
+			<groupId>org.hibernate</groupId>
+
+			<artifactId>hibernate-core</artifactId>
+
+			<version>${hibernate.version}</version>
+
+		</dependency>
+
+		<!-- https://mvnrepository.com/artifact/org.postgresql/postgresql -->
+		<dependency>
+		    <groupId>org.postgresql</groupId>
+		    <artifactId>postgresql</artifactId>
+		    <version>42.2.5</version>
+		</dependency>
+
+
+		<dependency>
+			<groupId>commons-dbcp</groupId>
+			<artifactId>commons-dbcp</artifactId>
+			<version>1.4</version>
+		</dependency>
+	</dependencies>
+
+</project>
