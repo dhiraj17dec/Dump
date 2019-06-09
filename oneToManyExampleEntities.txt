@@ -1,0 +1,107 @@
+package com.nuclear.entity;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.OneToMany;
+import javax.persistence.SequenceGenerator;
+import javax.persistence.Table;
+
+@Entity
+@Table(name="optimization")
+public class Optimization {
+
+	@Id
+	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "optimization_generator")
+	@SequenceGenerator(name="optimization_generator", sequenceName = "optimization_seq", initialValue = 1, allocationSize=50)
+	@Column(name = "optimization_id")
+    private Long id;
+
+	@OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+	@JoinColumn(name = "optimization_id")
+	private List<Outage> outages = new ArrayList<Outage>();
+	
+	
+}
+
+
+
+package com.nuclear.entity;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.OneToMany;
+import javax.persistence.SequenceGenerator;
+import javax.persistence.Table;
+
+@Entity
+@Table(name="outages")
+public class Outage {
+
+	@Id
+	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "outages_generator")
+	@SequenceGenerator(name="outages_generator", sequenceName = "outages_seq", initialValue = 1, allocationSize=50)
+	@Column(name="outage_id")
+    private Long outageId;
+
+    @Column(name="outage_name", unique = true)
+    private String outageName;
+
+	@OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+	@JoinColumn(name = "outage_id")
+	private List<Task> tasksList = new ArrayList<>();
+	
+}
+
+
+
+package com.nuclear.entity;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.OneToMany;
+import javax.persistence.SequenceGenerator;
+import javax.persistence.Table;
+
+@Entity
+@Table(name="task")
+public class Task {
+
+	@Id
+	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "task_generator")
+	@SequenceGenerator(name="task_generator", sequenceName = "task_seq", initialValue = 1, allocationSize=50)
+	@Column(name = "task_id")
+    private Long taskId;
+
+	@Column(name="task_name", unique = true)
+	private String taskName;
+	
+	@OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+	@JoinColumn(name = "outage_id")
+	private List<Task> tasksList = new ArrayList<>();
+	
+}
+
